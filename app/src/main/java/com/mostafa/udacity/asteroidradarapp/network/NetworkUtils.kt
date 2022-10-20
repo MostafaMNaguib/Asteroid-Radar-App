@@ -2,6 +2,7 @@ package com.mostafa.udacity.asteroidradarapp.network
 
 
 import com.mostafa.udacity.asteroidradarapp.data.model.Asteroid
+import com.mostafa.udacity.asteroidradarapp.database.AsteroidTable
 import com.mostafa.udacity.asteroidradarapp.utils.Constants
 import org.json.JSONObject
 import java.text.SimpleDateFormat
@@ -57,4 +58,19 @@ private fun getNextSevenDaysFormattedDates(): ArrayList<String> {
     }
 
     return formattedDateList
+}
+
+fun List<Asteroid>.asAsteroidEntries() : List<AsteroidTable> {
+    return map {
+        AsteroidTable(
+            id = it.id,
+            codename = it.codename,
+            closeApproachDate = it.closeApproachDate,
+            absoluteMagnitude = it.absoluteMagnitude,
+            estimatedDiameter = it.estimatedDiameter,
+            relativeVelocity = it.relativeVelocity,
+            distanceFromEarth = it.distanceFromEarth,
+            isPotentiallyHazardous = it.isPotentiallyHazardous
+        )
+    }
 }
