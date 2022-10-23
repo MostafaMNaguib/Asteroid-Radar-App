@@ -1,9 +1,14 @@
 package com.mostafa.udacity.asteroidradarapp.network
 
 
+import android.app.Application
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import com.mostafa.udacity.asteroidradarapp.data.model.Asteroid
 import com.mostafa.udacity.asteroidradarapp.database.AsteroidTable
 import com.mostafa.udacity.asteroidradarapp.utils.Constants
+import com.mostafa.udacity.asteroidradarapp.utils.Constants.DEFAULT_END_DATE_DAYS
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
@@ -74,3 +79,24 @@ fun List<Asteroid>.asAsteroidEntries() : List<AsteroidTable> {
         )
     }
 }
+
+fun checkInternetConnection(application: Application):Boolean{
+    val connectivityManager = application.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    val activeNetwork: NetworkInfo? = connectivityManager.activeNetworkInfo
+    return activeNetwork!!.isConnected
+}
+
+
+fun getStartDate():String{
+    val calendar = Calendar.getInstance()
+    calendar.add(Calendar.DAY_OF_YEAR, DEFAULT_END_DATE_DAYS)
+    val current = calendar.time
+    val end = SimpleDateFormat(Constants.API_QUERY_DATE_FORMAT, Locale.getDefault())
+    return end.format(current)
+}
+fun getEndDate():String{
+    val start = SimpleDateFormat(Constants.API_QUERY_DATE_FORMAT, Locale.getDefault())
+    val current = Calendar.getInstance().time
+    return start.format(current)
+}
+

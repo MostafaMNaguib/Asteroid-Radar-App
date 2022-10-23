@@ -1,11 +1,13 @@
 package com.mostafa.udacity.asteroidradarapp.ui.main
 
 import android.app.Application
+import android.widget.Toast
 import androidx.lifecycle.*
 import com.mostafa.udacity.asteroidradarapp.data.model.Asteroid
 import com.mostafa.udacity.asteroidradarapp.data.model.PictureOfDay
 import com.mostafa.udacity.asteroidradarapp.data.repositories.AsteroidsRepository
 import com.mostafa.udacity.asteroidradarapp.database.AsteroidDatabase
+import com.mostafa.udacity.asteroidradarapp.network.checkInternetConnection
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
@@ -16,51 +18,33 @@ class MainViewModel(app: Application): AndroidViewModel(app)
     private val repository = AsteroidsRepository(database)
     val asteroids = repository.asteroids
 
-    private val _pictureOfDay = MutableLiveData<PictureOfDay>()
+    val todayAsteroids:LiveData<List<Asteroid>>
+        get() = repository.todayAsteroids
+
+    val asteroidsFromToday:LiveData<List<Asteroid>>
+        get() = repository.asteroidsFromToday
+
+
     val pictureOfDay: LiveData<PictureOfDay>
-        get() = _pictureOfDay
+        get() = repository.pictureOfDay
 
     private val _navigateToDetailFragment = MutableLiveData<Asteroid?>()
     val navigateToDetailFragment
         get() = _navigateToDetailFragment
 
-    private val mockData = false
-    private val _mockAsteroids = MutableLiveData<List<Asteroid>>()
-    val mockAsteroids : LiveData<List<Asteroid>>
-        get() = _mockAsteroids
 
     init {
-        if(mockData) {
-            mockData()
-        } else {
-            refreshAsteroids()
-            getPictureOfDay()
+        viewModelScope.launch {
+            if (checkInternetConnection(app)) {
+                viewModelScope.launch {
+                    repository.refreshAsteroids()
+                    repository.refreshPicture()
+                }
+            }else {
+                Toast.makeText(app.applicationContext,"Connect to internet to get live data",
+                    Toast.LENGTH_LONG).show()
+            }
         }
-    }
-
-    private fun mockData() {
-
-        val dataList = mutableListOf<Asteroid>()
-
-        var count = 1
-        while (count <= 10) {
-
-            val data = Asteroid(
-                count.toLong(),
-                "codename:$count",
-                "2022-10-$count",
-                Random(100).nextDouble(),
-                Random(100).nextDouble(),
-                Random(100).nextDouble(),
-                Random(100).nextDouble(),
-                true)
-
-            dataList.add(data)
-
-            ++count
-        }
-
-        _mockAsteroids.postValue(dataList)
     }
 
     fun onAsteroidItemClick(data: Asteroid) {
@@ -82,14 +66,6 @@ class MainViewModel(app: Application): AndroidViewModel(app)
         }
     }
 
-    private fun getPictureOfDay() {
-        viewModelScope.launch {
-            try {
-                _pictureOfDay.value = repository.getPictureOfDay()
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-    }
+
 
 }

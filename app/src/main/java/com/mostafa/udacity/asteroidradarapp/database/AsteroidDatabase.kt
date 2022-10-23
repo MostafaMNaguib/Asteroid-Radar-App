@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.mostafa.udacity.asteroidradarapp.utils.DatabaseConstants
 
-@Database(version = 1,entities = [AsteroidTable::class])
+@Database(version = 2, exportSchema = false,entities = [AsteroidTable::class,PictureOfDayTable::class])
 abstract class AsteroidDatabase : RoomDatabase()
 {
     abstract val databaseDao: DatabaseDao
@@ -22,6 +22,7 @@ abstract class AsteroidDatabase : RoomDatabase()
                         context.applicationContext,
                         AsteroidDatabase::class.java,
                         DatabaseConstants.DATABASE_FILE_NAME)
+                        .fallbackToDestructiveMigration()
                         .build()
                 }
             }

@@ -2,6 +2,7 @@ package com.mostafa.udacity.asteroidradarapp.database
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.mostafa.udacity.asteroidradarapp.network.getEndDate
 import com.mostafa.udacity.asteroidradarapp.utils.DatabaseConstants
 
 @Entity(tableName = DatabaseConstants.TABLE_NAME)
@@ -14,4 +15,6 @@ data class AsteroidTable(
     val estimatedDiameter: Double,
     val relativeVelocity: Double,
     val distanceFromEarth: Double,
-    val isPotentiallyHazardous: Boolean)
+    val isPotentiallyHazardous: Boolean,
+    val day: String = getEndDate()
+    )

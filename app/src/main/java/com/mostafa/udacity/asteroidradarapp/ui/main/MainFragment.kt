@@ -2,6 +2,7 @@ package com.mostafa.udacity.asteroidradarapp.ui.main
 
 import android.os.Bundle
 import android.view.*
+import androidx.databinding.BindingAdapter
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -9,11 +10,14 @@ import com.mostafa.udacity.asteroidradarapp.R
 import com.mostafa.udacity.asteroidradarapp.databinding.FragmentMainBinding
 import com.mostafa.udacity.asteroidradarapp.ui.main.adapter.AsteroidItemClickListener
 import com.mostafa.udacity.asteroidradarapp.ui.main.adapter.AsteroidsListAdapter
+import com.mostafa.udacity.asteroidradarapp.utils.bindImagePictureOfDay
 
 class MainFragment: Fragment()
 {
 
     private lateinit var binding: FragmentMainBinding
+
+    private lateinit var asteroidsAdapter: AsteroidsListAdapter
 
     private val viewModel: MainViewModel by lazy {
         ViewModelProvider(this).get(MainViewModel::class.java)
@@ -42,12 +46,13 @@ class MainFragment: Fragment()
     private fun setupUi(){
 
         // recycle view
-        val adapter = AsteroidsListAdapter(AsteroidItemClickListener { asteroidId ->
+        asteroidsAdapter = AsteroidsListAdapter(AsteroidItemClickListener { asteroidId ->
             viewModel.onAsteroidItemClick(asteroidId)
         })
-        binding.asteroidRecycler.adapter = adapter
+
+        binding.asteroidRecycler.adapter = asteroidsAdapter
         viewModel.asteroids.observe(viewLifecycleOwner) { asteroids ->
-            adapter.submitList(asteroids)
+            asteroidsAdapter.submitList(asteroids)
         }
 
         // navigation
@@ -57,6 +62,15 @@ class MainFragment: Fragment()
                 viewModel.onDetailFragmentNavigated()
             }
         }
+        
+        viewModel.pictureOfDay.observe(viewLifecycleOwner){
+            bindImagePictureOfDay(
+                binding.activityMainImageOfTheDay,it
+            )
+        }
+
+
+
 
     }
 
@@ -66,6 +80,23 @@ class MainFragment: Fragment()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId) {
+            R.id.show_all_menu -> {
+                viewModel.asteroidsFromToday.observe(viewLifecycleOwner){
+                    asteroidsAdapter.submitList(it)
+                }
+            }
+            R.id.show_rent_menu -> {
+                viewModel.todayAsteroids.observe(viewLifecycleOwner){
+                    asteroidsAdapter.submitList(it)
+                }
+            }
+            R.id.show_buy_menu -> {
+                viewModel.asteroids.observe(viewLifecycleOwner){
+                    asteroidsAdapter.submitList(it)
+                }
+            }
+        }
         return true
     }
 
