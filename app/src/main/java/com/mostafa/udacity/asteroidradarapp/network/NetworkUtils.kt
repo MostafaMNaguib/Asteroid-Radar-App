@@ -10,6 +10,7 @@ import com.mostafa.udacity.asteroidradarapp.database.AsteroidTable
 import com.mostafa.udacity.asteroidradarapp.utils.Constants
 import com.mostafa.udacity.asteroidradarapp.utils.Constants.DEFAULT_END_DATE_DAYS
 import org.json.JSONObject
+import java.net.InetAddress
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -81,9 +82,13 @@ fun List<Asteroid>.asAsteroidEntries() : List<AsteroidTable> {
 }
 
 fun checkInternetConnection(application: Application):Boolean{
-    val connectivityManager = application.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-    val activeNetwork: NetworkInfo? = connectivityManager.activeNetworkInfo
-    return activeNetwork!!.isConnected
+    return try {
+        val ipAddr: InetAddress = InetAddress.getByName("google.com")
+        //You can replace it with your name
+        !ipAddr.equals("")
+    } catch (e: Exception) {
+        false
+    }
 }
 
 
